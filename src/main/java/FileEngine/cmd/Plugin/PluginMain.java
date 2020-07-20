@@ -161,7 +161,11 @@ public class PluginMain extends Plugin {
                     timer = false;
                     //开始显示
                     if (!command.isEmpty()) {
-                        addToResultQueue("运行命令:" + command);
+                        if (!"open".equals(command)) {
+                            addToResultQueue("运行命令:" + command);
+                        } else {
+                            addToResultQueue("打开CMD窗口");
+                        }
                     }
                 }
             }
@@ -197,18 +201,22 @@ public class PluginMain extends Plugin {
     public void keyPressed(KeyEvent e, String result) {
         if (e.getKeyCode() == 10) {
             //enter
-            String[] strings = colon.split(result);
-            if (strings.length == 2) {
-                String command = strings[1];
-                String batFile = tmpDir + File.separator + "$$bat.bat";
-                generateBatFile(command, batFile);
-                String start = batFile.substring(0,2);
-                String end = batFile.substring(2);
-                try {
-                    Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
-                }catch (IOException e1) {
-                    e1.printStackTrace();
+            try {
+                if ("打开CMD窗口".equals(result)) {
+                    Runtime.getRuntime().exec("cmd.exe /k start");
+                } else {
+                    String[] strings = colon.split(result);
+                    if (strings.length == 2) {
+                        String command = strings[1];
+                        String batFile = tmpDir + File.separator + "$$bat.bat";
+                        generateBatFile(command, batFile);
+                        String start = batFile.substring(0, 2);
+                        String end = batFile.substring(2);
+                        Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
+                    }
                 }
+            }catch (IOException e1) {
+                e1.printStackTrace();
             }
         }
     }
