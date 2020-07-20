@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.*;
 
+import FileEngine.cmd.Plugin.checkupdate.UpdateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -262,7 +263,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public ImageIcon getPluginIcon() {
-        return null;
+        return new ImageIcon(PluginMain.class.getResource("/cmd.png"));
     }
 
     /**
@@ -271,7 +272,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getOfficialSite() {
-        return "";
+        return "https://github.com/XUANXUQAQ/File-Engine-Cmd-Plugin";
     }
 
     /**
@@ -280,7 +281,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getVersion() {
-        return "1.0";
+        return UpdateUtil._getPluginVersion();
     }
 
     /**
@@ -290,7 +291,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getDescription() {
-        return "Test cmd plugin";
+        return "A plugin to make File-Engine run cmd commands quickly.";
     }
 
     /**
@@ -300,7 +301,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public boolean isLatest() {
-        return true;
+        return UpdateUtil._isLatest();
     }
 
     /**
@@ -311,7 +312,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getUpdateURL() {
-        return "";
+        return UpdateUtil._getUpdateURL();
     }
 
     /**
