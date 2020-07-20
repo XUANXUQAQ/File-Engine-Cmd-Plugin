@@ -155,19 +155,23 @@ public class PluginMain extends Plugin {
         initSettings();
         CachedThreadPool.getInstance().executeTask(() -> {
             long endTime;
-            while (isNotExit) {
-                endTime = System.currentTimeMillis();
-                if ((endTime - startTime > 300) && timer) {
-                    timer = false;
-                    //开始显示
-                    if (!command.isEmpty()) {
-                        if (!"open".equals(command)) {
-                            addToResultQueue("运行命令:" + command);
-                        } else {
-                            addToResultQueue("打开CMD窗口");
+            try {
+                while (isNotExit) {
+                    endTime = System.currentTimeMillis();
+                    if ((endTime - startTime > 300) && timer) {
+                        timer = false;
+                        //开始显示
+                        if (!command.isEmpty()) {
+                            if (!"open".equals(command)) {
+                                addToResultQueue("运行命令:" + command);
+                            } else {
+                                addToResultQueue("打开CMD窗口");
+                            }
                         }
                     }
+                    Thread.sleep(50);
                 }
+            }catch (InterruptedException ignored) {
             }
         });
     }
