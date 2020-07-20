@@ -1,0 +1,5 @@
+{
+  "className" : "FileEngine.cmd.Plugin.PluginMain",
+  "identifier" : "cmd",
+  "name" : "Cmd"
+}
