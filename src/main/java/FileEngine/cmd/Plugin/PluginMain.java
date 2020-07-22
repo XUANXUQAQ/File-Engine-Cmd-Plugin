@@ -26,6 +26,7 @@ public class PluginMain extends Plugin {
     private final String tmpDir = "plugins/Plugin configuration files/Cmd/tmp";
     private Color backgroundColor;
     private Color labelColor;
+    private ImageIcon cmdIcon;
 
     private void initSettings() {
         initFile();
@@ -55,8 +56,6 @@ public class PluginMain extends Plugin {
     private void generateBatFile(String command, String filePath) {
         try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
             buffW.write(command);
-            buffW.newLine();
-            buffW.write("pause");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,6 +152,7 @@ public class PluginMain extends Plugin {
     @Override
     public void loadPlugin() {
         initSettings();
+        cmdIcon = new ImageIcon(PluginMain.class.getResource("/cmd.png"));
         CachedThreadPool.getInstance().executeTask(() -> {
             long endTime;
             try {
@@ -337,6 +337,7 @@ public class PluginMain extends Plugin {
     @Override
     public void showResultOnLabel(String result, JLabel label, boolean isChosen) {
         label.setText(result);
+        label.setIcon(cmdIcon);
         if (isChosen) {
             label.setBackground(labelColor);
         } else {
