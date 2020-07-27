@@ -303,7 +303,10 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getDescription() {
-        return "A plugin to make File-Engine run cmd commands quickly.";
+        return "A plugin to make File-Engine run cmd commands quickly.\n" +
+                "Usage:  input \">cmd ipconfig\" ---> run command \"ipconfig\" in cmd.\n" +
+                "快速运行cmd命令插件\n" +
+                "使用方法： 输入 “>cmd ipconfig” ---> 在cmd中运行命令“ipconfig”.";
     }
 
     /**

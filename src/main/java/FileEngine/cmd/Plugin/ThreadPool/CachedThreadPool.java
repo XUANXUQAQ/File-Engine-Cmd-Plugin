@@ -1,7 +1,6 @@
 package FileEngine.cmd.Plugin.ThreadPool;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class CachedThreadPool {
     private static class ThreadPoolBuilder {
@@ -15,7 +14,11 @@ public class CachedThreadPool {
         return ThreadPoolBuilder.INSTANCE;
     }
 
-    private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    private final ExecutorService cachedThreadPool = new ThreadPoolExecutor(0,
+            50,
+            60L,
+            TimeUnit.SECONDS,
+            new SynchronousQueue<>());
 
     public void executeTask(Runnable todo) {
         cachedThreadPool.execute(todo);
