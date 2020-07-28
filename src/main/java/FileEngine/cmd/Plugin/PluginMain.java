@@ -130,6 +130,9 @@ public class PluginMain extends Plugin {
         return _getApiVersion();
     }
 
+    public void clearResultQueue() {
+        _clearResultQueue();
+    }
     /**
      * When the search bar textChanged, this function will be called.
      * @param text

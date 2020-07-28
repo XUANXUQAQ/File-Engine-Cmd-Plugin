@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class Plugin {
     private final ConcurrentLinkedQueue<String> resultQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<String[]> messageQueue = new ConcurrentLinkedQueue<>();
-    private static final int API_VERSION = 2;
+    private static final int API_VERSION = 3;
 
     public void addToResultQueue(String result) {
         resultQueue.add(result);
@@ -17,6 +17,10 @@ public abstract class Plugin {
     public void displayMessage(String caption, String message) {
         String[] messages = new String[]{caption, message};
         messageQueue.add(messages);
+    }
+
+    public void _clearResultQueue() {
+        resultQueue.clear();
     }
 
     protected int _getApiVersion() {
