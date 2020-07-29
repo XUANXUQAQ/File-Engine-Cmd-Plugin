@@ -10,12 +10,12 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class UpdateUtil {
-    private static final String CURRENT_VERSION = "1.1";
+    private static final String CURRENT_VERSION = "1.2";
     private static String updateURL;
 
     private static JSONObject getVersionInfo() throws IOException {
         StringBuilder jsonUpdate = new StringBuilder();
-        URL updateServer = new URL("https://gitee.com/xuanxuF/File-Engine/raw/master/Plugins%20Repository/CmdPluginVersion.json");
+        URL updateServer = new URL("https://raw.githubusercontent.com/XUANXUQAQ/File-Engine-Version/master/Plugins%20Repository/CmdPluginVersion.json");
         URLConnection uc = updateServer.openConnection();
         uc.setConnectTimeout(3 * 1000);
         //防止屏蔽程序抓取而返回403错误
