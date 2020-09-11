@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class PluginMain extends Plugin {
@@ -22,72 +23,15 @@ public class PluginMain extends Plugin {
     private volatile boolean isNotExit = true;
     private volatile String command;
     private static final Pattern colon = Pattern.compile(":");
-    private final String configFile = "plugins/Plugin configuration files/Cmd/settings.json";
     private final String tmpDir = "plugins/Plugin configuration files/Cmd/tmp";
     private Color backgroundColor;
     private Color labelColor;
     private ImageIcon cmdIcon;
 
-    private void initSettings() {
-        initFile();
-        StringBuilder strBuilder = new StringBuilder();
-        String eachLine;
-         try (BufferedReader buffR = new BufferedReader(new InputStreamReader(new FileInputStream(configFile), StandardCharsets.UTF_8))) {
-             while ((eachLine = buffR.readLine()) != null) {
-                 strBuilder.append(eachLine);
-             }
-             JSONObject json = JSONObject.parseObject(strBuilder.toString());
-             backgroundColor = new Color(json.getInteger("backgroundColor"));
-             labelColor = new Color(json.getInteger("labelColor"));
-         } catch (Exception e) {
-             e.printStackTrace();
-         } finally {
-             if (backgroundColor == null) {
-                 backgroundColor = new Color(0xffffff);
-             }
-             if (labelColor == null) {
-                 labelColor = new Color(0xff9868);
-             }
-             //保存配置文件
-             saveConfigs();
-         }
-    }
-
     private void generateBatFile(String command, String filePath) {
         try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
             buffW.write(command);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void initFile() {
-        try {
-            File settings = new File(configFile);
-            File parent = settings.getParentFile();
-            File tmp = new File(tmpDir);
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
-            if (!tmp.exists()) {
-                tmp.mkdirs();
-            }
-            if (!settings.exists()) {
-                settings.createNewFile();
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveConfigs() {
-        try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8))) {
-            JSONObject json = new JSONObject();
-            json.put("backgroundColor", backgroundColor.getRGB());
-            json.put("labelColor", labelColor.getRGB());
-            String format = JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-            buffW.write(format);
-        }catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -133,6 +77,21 @@ public class PluginMain extends Plugin {
     public void clearResultQueue() {
         _clearResultQueue();
     }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to tell the plugin the current Theme settings.
+     * You can use them on method showResultOnLabel(String, JLabel, boolean).
+     * When the label is chosen by user, you could set the label background as chosenLabelColor.
+     * When the label isn't chosen by user, you could set the label background as defaultColor.
+     * @see #showResultOnLabel(String, JLabel, boolean)
+     * @param defaultColor When the label isn't chosen, it will be shown as this color.
+     * @param choseLabelColor When the label is chosen, it will be shown as this color.
+     */
+    public void setCurrentTheme(int defaultColor, int choseLabelColor) {
+        backgroundColor = new Color(defaultColor);
+        labelColor = new Color(choseLabelColor);
+    }
+
     /**
      * When the search bar textChanged, this function will be called.
      * @param text
@@ -154,7 +113,6 @@ public class PluginMain extends Plugin {
      */
     @Override
     public void loadPlugin() {
-        initSettings();
         cmdIcon = new ImageIcon(PluginMain.class.getResource("/cmd.png"));
         CachedThreadPool.getInstance().executeTask(() -> {
             long endTime;
@@ -172,7 +130,7 @@ public class PluginMain extends Plugin {
                             }
                         }
                     }
-                    Thread.sleep(50);
+                    TimeUnit.MILLISECONDS.sleep(50);
                 }
             }catch (InterruptedException ignored) {
             }
