@@ -3,6 +3,7 @@ package FileEngine.cmd.Plugin;
 import FileEngine.cmd.Plugin.ThreadPool.CachedThreadPool;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -24,8 +25,9 @@ public class PluginMain extends Plugin {
     private volatile String command;
     private static final Pattern colon = Pattern.compile(":");
     private final String tmpDir = "plugins/Plugin configuration files/Cmd/tmp";
-    private Color backgroundColor;
-    private Color labelColor;
+    private Color backgroundColor = new Color(0xffffff);
+    private Color labelColor = new Color(0xcccccc);
+    private Border border = BorderFactory.createLineBorder(new Color(0xffffff));
     private ImageIcon cmdIcon;
 
     private void generateBatFile(String command, String filePath) {
@@ -87,9 +89,11 @@ public class PluginMain extends Plugin {
      * @param defaultColor When the label isn't chosen, it will be shown as this color.
      * @param choseLabelColor When the label is chosen, it will be shown as this color.
      */
-    public void setCurrentTheme(int defaultColor, int choseLabelColor) {
+    @Override
+    public void setCurrentTheme(int defaultColor, int choseLabelColor, int borderColor) {
         backgroundColor = new Color(defaultColor);
         labelColor = new Color(choseLabelColor);
+        border = BorderFactory.createLineBorder(new Color(borderColor));
     }
 
     /**
@@ -302,6 +306,7 @@ public class PluginMain extends Plugin {
     public void showResultOnLabel(String result, JLabel label, boolean isChosen) {
         label.setText(result);
         label.setIcon(cmdIcon);
+        label.setBorder(border);
         if (isChosen) {
             label.setBackground(labelColor);
         } else {
