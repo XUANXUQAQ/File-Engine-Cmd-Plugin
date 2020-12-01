@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
 public class UpdateUtil {
-    private static final String CURRENT_VERSION = "1.3";
+    private static final String CURRENT_VERSION = "1.4";
     private static String updateURL;
 
     private static JSONObject getVersionInfo() throws IOException {
@@ -33,18 +33,15 @@ public class UpdateUtil {
         return updateURL;
     }
 
-    public static boolean _isLatest() {
-        try {
-            JSONObject json = getVersionInfo();
-            String latestVersion = json.getString("version");
-            if (Double.parseDouble(latestVersion) > Double.parseDouble(CURRENT_VERSION)) {
-                updateURL = json.getString("url");
-                return false;
-            }
-        } catch (IOException e) {
+    public static boolean _isLatest() throws IOException {
+        JSONObject json = getVersionInfo();
+        String latestVersion = json.getString("version");
+        if (Double.parseDouble(latestVersion) > Double.parseDouble(CURRENT_VERSION)) {
+            updateURL = json.getString("url");
+            return false;
+        } else {
             return true;
         }
-        return true;
     }
 
     public static String _getPluginVersion() {
