@@ -27,7 +27,6 @@ public class PluginMain extends Plugin {
     private final String tmpDir = "plugins/Plugin configuration files/Cmd/tmp";
     private Color backgroundColor = new Color(0xffffff);
     private Color labelColor = new Color(0xcccccc);
-    private Border border = BorderFactory.createLineBorder(new Color(0xffffff));
     private ImageIcon cmdIcon;
 
     private void generateBatFile(String command, String filePath) {
@@ -93,7 +92,6 @@ public class PluginMain extends Plugin {
     public void setCurrentTheme(int defaultColor, int choseLabelColor, int borderColor) {
         backgroundColor = new Color(defaultColor);
         labelColor = new Color(choseLabelColor);
-        border = BorderFactory.createLineBorder(new Color(borderColor));
     }
 
     /**
