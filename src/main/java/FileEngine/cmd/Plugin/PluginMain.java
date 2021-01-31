@@ -306,7 +306,6 @@ public class PluginMain extends Plugin {
     public void showResultOnLabel(String result, JLabel label, boolean isChosen) {
         label.setText(result);
         label.setIcon(cmdIcon);
-        label.setBorder(border);
         if (isChosen) {
             label.setBackground(labelColor);
         } else {
