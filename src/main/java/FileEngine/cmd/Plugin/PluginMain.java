@@ -24,7 +24,8 @@ public class PluginMain extends Plugin {
     private volatile boolean isNotExit = true;
     private volatile String command;
     private static final Pattern colon = Pattern.compile(":");
-    private final String tmpDir = "plugins/Plugin configuration files/Cmd/tmp";
+    private final String configurationPath = "plugins/Plugin configuration files/Cmd";
+    private final String tmpDir = configurationPath + "/tmp";
     private Color backgroundColor = new Color(0xffffff);
     private Color labelColor = new Color(0xcccccc);
     private ImageIcon cmdIcon;
@@ -116,6 +117,25 @@ public class PluginMain extends Plugin {
     @Override
     public void loadPlugin() {
         cmdIcon = new ImageIcon(PluginMain.class.getResource("/cmd.png"));
+        File pluginFolder = new File(configurationPath);
+        boolean ret;
+        if (!pluginFolder.exists()) {
+            ret = pluginFolder.mkdirs();
+        } else {
+            ret = true;
+        }
+        if (!ret) {
+            throw new RuntimeException("初始化文件夹失败");
+        }
+        File tmpD = new File(tmpDir);
+        if (!tmpD.exists()) {
+            ret = tmpD.mkdirs();
+        } else {
+            ret = true;
+        }
+        if (!ret) {
+            throw new RuntimeException("初始化文件夹失败");
+        }
         CachedThreadPool.getInstance().executeTask(() -> {
             long endTime;
             try {
