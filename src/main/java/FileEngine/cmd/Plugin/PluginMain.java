@@ -1,20 +1,20 @@
 package FileEngine.cmd.Plugin;
 
 import FileEngine.cmd.Plugin.ThreadPool.CachedThreadPool;
+import FileEngine.cmd.Plugin.checkupdate.UpdateUtil;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.*;
-
-import FileEngine.cmd.Plugin.checkupdate.UpdateUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -31,7 +31,7 @@ public class PluginMain extends Plugin {
     private ImageIcon cmdIcon;
 
     private void generateBatFile(String command, String filePath) {
-        try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
+        try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(filePath)), StandardCharsets.UTF_8))) {
             buffW.write(command);
         } catch (IOException e) {
             e.printStackTrace();
@@ -116,7 +116,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public void loadPlugin() {
-        cmdIcon = new ImageIcon(PluginMain.class.getResource("/cmd.png"));
+        cmdIcon = new ImageIcon(Objects.requireNonNull(PluginMain.class.getResource("/cmd.png")));
         File pluginFolder = new File(configurationPath);
         boolean ret;
         if (!pluginFolder.exists()) {
@@ -258,7 +258,7 @@ public class PluginMain extends Plugin {
      */
     @Override
     public ImageIcon getPluginIcon() {
-        return new ImageIcon(PluginMain.class.getResource("/cmd.png"));
+        return new ImageIcon(Objects.requireNonNull(PluginMain.class.getResource("/cmd.png")));
     }
 
     /**
