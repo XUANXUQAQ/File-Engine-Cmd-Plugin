@@ -130,8 +130,6 @@ public class PluginMain extends Plugin {
         File tmpD = new File(tmpDir);
         if (!tmpD.exists()) {
             ret = tmpD.mkdirs();
-        } else {
-            ret = true;
         }
         if (!ret) {
             throw new RuntimeException("初始化文件夹失败");
@@ -286,11 +284,11 @@ public class PluginMain extends Plugin {
      */
     @Override
     public String getDescription() {
-        return "A plugin to make File-Engine run cmd commands quickly.\n" +
-                "Usage:  input \">cmd ipconfig\" ---> run command \"ipconfig\" in cmd.\n" +
-                "快速运行cmd命令插件\n" +
-                "使用方法： 输入 “>cmd ipconfig” ---> 在cmd中运行命令“ipconfig”." +
-                "图标来自： https://icons8.com/icon/90807/cmd icon by https://icons8.com";
+        return """
+                A plugin to make File-Engine run cmd commands quickly.
+                Usage:  input ">cmd ipconfig" ---> run command "ipconfig" in cmd.
+                快速运行cmd命令插件
+                使用方法： 输入 “>cmd ipconfig” ---> 在cmd中运行命令“ipconfig”.图标来自： https://icons8.com/icon/90807/cmd icon by https://icons8.com""";
     }
 
     /**
