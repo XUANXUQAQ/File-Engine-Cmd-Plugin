@@ -31,7 +31,7 @@ public class PluginMain extends Plugin {
     private ImageIcon cmdIcon;
 
     private void generateBatFile(String command, String filePath) {
-        try (BufferedWriter buffW = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(filePath)), StandardCharsets.UTF_8))) {
+        try (var buffW = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(filePath)), StandardCharsets.UTF_8))) {
             buffW.write(command);
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,6 +51,7 @@ public class PluginMain extends Plugin {
     /**
      * Do Not Remove, this is used for File-Engine to get message from the plugin.
      * You can show message using "displayMessage(String caption, String message)"
+     *
      * @return String[2], the first string is caption, the second string is message.
      * @see #displayMessage(String, String)
      */
@@ -61,8 +62,9 @@ public class PluginMain extends Plugin {
     /**
      * Do Not Remove, this is used for File-Engine to get results from the plugin
      * You can add result using "addToResultQueue(String result)".
-     * @see #addToResultQueue(String)
+     *
      * @return result
+     * @see #addToResultQueue(String)
      */
     public String pollFromResultQueue() {
         return _pollFromResultQueue();
@@ -70,6 +72,7 @@ public class PluginMain extends Plugin {
 
     /**
      * Do Not Remove, this is used for File-Engine to check the API version.
+     *
      * @return Api version
      */
     public int getApiVersion() {
@@ -85,9 +88,10 @@ public class PluginMain extends Plugin {
      * You can use them on method showResultOnLabel(String, JLabel, boolean).
      * When the label is chosen by user, you could set the label background as chosenLabelColor.
      * When the label isn't chosen by user, you could set the label background as defaultColor.
-     * @see #showResultOnLabel(String, JLabel, boolean)
-     * @param defaultColor When the label isn't chosen, it will be shown as this color.
+     *
+     * @param defaultColor    When the label isn't chosen, it will be shown as this color.
      * @param choseLabelColor When the label is chosen, it will be shown as this color.
+     * @see #showResultOnLabel(String, JLabel, boolean)
      */
     @Override
     public void setCurrentTheme(int defaultColor, int choseLabelColor, int borderColor) {
@@ -97,8 +101,8 @@ public class PluginMain extends Plugin {
 
     /**
      * When the search bar textChanged, this function will be called.
-     * @param text
-     * Example : When you input "&gt;examplePlugin TEST" to the search bar, the param will be "TEST"
+     *
+     * @param text Example : When you input "&gt;examplePlugin TEST" to the search bar, the param will be "TEST"
      */
     @Override
     public void textChanged(String text) {
@@ -152,7 +156,8 @@ public class PluginMain extends Plugin {
                     }
                     TimeUnit.MILLISECONDS.sleep(50);
                 }
-            }catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         });
     }
@@ -169,7 +174,8 @@ public class PluginMain extends Plugin {
     /**
      * Invoked when a key has been released.See the class description for the swing KeyEvent for a definition of a key released event.
      * Notice : Up and down keys will not be included (key code 38 and 40 will not be included).
-     * @param e KeyEvent, Which key on the keyboard is released.
+     *
+     * @param e      KeyEvent, Which key on the keyboard is released.
      * @param result Currently selected content.
      */
     @Override
@@ -179,37 +185,23 @@ public class PluginMain extends Plugin {
     /**
      * Invoked when a key has been pressed. See the class description for the swing KeyEvent for a definition of a key pressed event.
      * Notice : Up and down keys will not be included (key code 38 and 40 will not be included).
-     * @param e KeyEvent, Which key on the keyboard is pressed.
+     *
+     * @param e      KeyEvent, Which key on the keyboard is pressed.
      * @param result Currently selected content.
      */
     @Override
     public void keyPressed(KeyEvent e, String result) {
         if (e.getKeyCode() == 10) {
             //enter
-            try {
-                if ("打开CMD窗口".equals(result)) {
-                    Runtime.getRuntime().exec("cmd.exe /k start");
-                } else {
-                    String[] strings = colon.split(result);
-                    if (strings.length == 2) {
-                        String command = strings[1];
-                        String batFile = tmpDir + File.separator + "$$bat.bat";
-                        generateBatFile(command, batFile);
-                        String start = batFile.substring(0, 2);
-                        String end = batFile.substring(2);
-                        Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
-                    }
-                }
-            }catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            checkResultAndOpenCmd(result);
         }
     }
 
     /**
      * Invoked when a key has been typed.See the class description for the swing KeyEvent for a definition of a key typed event.
      * Notice : Up and down keys will not be included (key code 38 and 40 will not be included).
-     * @param e KeyEvent, Which key on the keyboard is pressed.
+     *
+     * @param e      KeyEvent, Which key on the keyboard is pressed.
      * @param result Currently selected content.
      */
     @Override
@@ -218,31 +210,44 @@ public class PluginMain extends Plugin {
 
     /**
      * Invoked when a mouse button has been pressed on a component.
-     * @param e Mouse event
+     *
+     * @param e      Mouse event
      * @param result Currently selected content.
      */
     @Override
     public void mousePressed(MouseEvent e, String result) {
         if (e.getClickCount() == 2) {
-            String[] strings = colon.split(result);
-            if (strings.length == 2) {
-                String command = strings[1];
-                String batFile = tmpDir + File.separator + "$$bat.bat";
-                generateBatFile(command, batFile);
-                String start = batFile.substring(0,2);
-                String end = batFile.substring(2);
-                try {
+            checkResultAndOpenCmd(result);
+        }
+    }
+
+    private void checkResultAndOpenCmd(String result) {
+        try {
+            if ("打开CMD窗口".equals(result)) {
+                Runtime.getRuntime().exec("cmd.exe /k start");
+            } else {
+                String[] strings = colon.split(result);
+                if (strings.length == 2) {
+                    String command = strings[1];
+                    if ("wt".equalsIgnoreCase(command.trim())) {
+                        command += " && exit";
+                    }
+                    String batFile = tmpDir + File.separator + "$$bat.bat";
+                    generateBatFile(command, batFile);
+                    String start = batFile.substring(0, 2);
+                    String end = batFile.substring(2);
                     Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
-                }catch (IOException e1) {
-                    e1.printStackTrace();
                 }
             }
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
     }
 
     /**
      * Invoked when a mouse button has been released on a component.
-     * @param e Mouse event
+     *
+     * @param e      Mouse event
      * @param result Currently selected content
      */
     @Override
@@ -252,6 +257,7 @@ public class PluginMain extends Plugin {
     /**
      * Get the plugin Icon. It can be the png, jpg.
      * Make the icon small, or it will occupy too much memory.
+     *
      * @return icon
      */
     @Override
@@ -261,6 +267,7 @@ public class PluginMain extends Plugin {
 
     /**
      * Get the official site of the plugin.
+     *
      * @return official site
      */
     @Override
@@ -270,6 +277,7 @@ public class PluginMain extends Plugin {
 
     /**
      * Get the plugin version.
+     *
      * @return version
      */
     @Override
@@ -280,6 +288,7 @@ public class PluginMain extends Plugin {
     /**
      * Get the description of the plugin.
      * Just write the description outside, and paste it to the return value.
+     *
      * @return description
      */
     @Override
@@ -293,6 +302,7 @@ public class PluginMain extends Plugin {
 
     /**
      * Check if the current version is the latest.
+     *
      * @return true or false
      * @see #getUpdateURL()
      */
@@ -304,8 +314,9 @@ public class PluginMain extends Plugin {
     /**
      * Get the plugin download url.
      * Invoke when the isLatest() returns false;
-     * @see #isLatest()
+     *
      * @return download url
+     * @see #isLatest()
      */
     @Override
     public String getUpdateURL() {
@@ -314,8 +325,9 @@ public class PluginMain extends Plugin {
 
     /**
      * Show the content to the GUI.
-     * @param result current selected content.
-     * @param label The label to be displayed.
+     *
+     * @param result   current selected content.
+     * @param label    The label to be displayed.
      * @param isChosen If the label is being selected.
      *                 If so, you are supposed to set the label at a different background.
      */
