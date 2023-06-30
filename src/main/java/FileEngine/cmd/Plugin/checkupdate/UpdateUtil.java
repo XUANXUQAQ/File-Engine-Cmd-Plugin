@@ -52,7 +52,7 @@ public class UpdateUtil {
             long start = System.currentTimeMillis();
             while (!downloadTasks.contains(url + new File(savePath, fileName).getAbsolutePath())) {
                 if (System.currentTimeMillis() - start > 10000) {
-                    throw new RuntimeException("获取插件cmd更新信息失败");
+                    throw new RuntimeException("获取插件Cmd更新信息失败");
                 }
                 TimeUnit.MILLISECONDS.sleep(100);
             }
