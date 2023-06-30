@@ -14,8 +14,10 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 public class PluginMain extends Plugin {
@@ -49,41 +51,6 @@ public class PluginMain extends Plugin {
     }
 
     /**
-     * Do Not Remove, this is used for File-Engine to get message from the plugin.
-     * You can show message using "displayMessage(String caption, String message)"
-     *
-     * @return String[2], the first string is caption, the second string is message.
-     * @see #displayMessage(String, String)
-     */
-    public String[] getMessage() {
-        return _getMessage();
-    }
-
-    /**
-     * Do Not Remove, this is used for File-Engine to get results from the plugin
-     * You can add result using "addToResultQueue(String result)".
-     *
-     * @return result
-     * @see #addToResultQueue(String)
-     */
-    public String pollFromResultQueue() {
-        return _pollFromResultQueue();
-    }
-
-    /**
-     * Do Not Remove, this is used for File-Engine to check the API version.
-     *
-     * @return Api version
-     */
-    public int getApiVersion() {
-        return _getApiVersion();
-    }
-
-    public void clearResultQueue() {
-        _clearResultQueue();
-    }
-
-    /**
      * Do Not Remove, this is used for File-Engine to tell the plugin the current Theme settings.
      * You can use them on method showResultOnLabel(String, JLabel, boolean).
      * When the label is chosen by user, you could set the label background as chosenLabelColor.
@@ -114,12 +81,9 @@ public class PluginMain extends Plugin {
         }
     }
 
-    /**
-     * When File-Engine is starting, the function will be called.
-     * You can initialize your plugin here
-     */
     @Override
-    public void loadPlugin() {
+    public void loadPlugin(Map<String, Object> configs) throws ClassNotFoundException {
+        UpdateUtil.registerDownloadListener();
         cmdIcon = new ImageIcon(Objects.requireNonNull(PluginMain.class.getResource("/cmd.png")));
         File pluginFolder = new File(configurationPath);
         boolean ret;
@@ -140,24 +104,24 @@ public class PluginMain extends Plugin {
         }
         CachedThreadPool.getInstance().executeTask(() -> {
             long endTime;
-            try {
-                while (isNotExit) {
-                    endTime = System.currentTimeMillis();
-                    if ((endTime - startTime > 300) && timer) {
-                        timer = false;
-                        //开始显示
-                        if (!command.isEmpty()) {
-                            if (!"open".equals(command)) {
-                                addToResultQueue("运行命令:" + command);
-                            } else {
-                                addToResultQueue("打开CMD窗口");
-                            }
+            while (isNotExit) {
+                endTime = System.currentTimeMillis();
+                if ((endTime - startTime > 300) && timer) {
+                    timer = false;
+                    //开始显示
+                    if (!command.isEmpty()) {
+                        if (!"open".equals(command)) {
+                            addToResultQueue("运行命令:" + command);
+                        } else {
+                            addToResultQueue("打开CMD窗口");
                         }
                     }
-                    TimeUnit.MILLISECONDS.sleep(50);
                 }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -222,25 +186,29 @@ public class PluginMain extends Plugin {
     }
 
     private void checkResultAndOpenCmd(String result) {
-        try {
-            if ("打开CMD窗口".equals(result)) {
+        if ("打开CMD窗口".equals(result)) {
+            try {
                 Runtime.getRuntime().exec("cmd.exe /k start");
-            } else {
-                String[] strings = colon.split(result);
-                if (strings.length == 2) {
-                    String command = strings[1];
-                    if ("wt".equalsIgnoreCase(command.trim())) {
-                        command += " && exit";
-                    }
-                    String batFile = tmpDir + File.separator + "$$bat.bat";
-                    generateBatFile(command, batFile);
-                    String start = batFile.substring(0, 2);
-                    String end = batFile.substring(2);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            String[] strings = colon.split(result);
+            if (strings.length == 2) {
+                String command = strings[1];
+                if ("wt".equalsIgnoreCase(command.trim())) {
+                    command += " && exit";
+                }
+                String batFile = tmpDir + File.separator + "$$bat.bat";
+                generateBatFile(command, batFile);
+                String start = batFile.substring(0, 2);
+                String end = batFile.substring(2);
+                try {
                     Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
         }
     }
 
@@ -345,5 +313,127 @@ public class PluginMain extends Plugin {
     @Override
     public String getAuthor() {
         return "XUANXU";
+    }
+
+    @Override
+    public void searchBarVisible(String showingMode) {
+    }
+
+    @Override
+    public void configsChanged(Map<String, Object> configs) {
+    }
+
+    @Override
+    public void eventProcessed(Class<?> c, Object eventInstance) {
+    }
+
+
+    /**
+     * Do Not Remove, this is used for File-Engine to get message from the plugin.
+     * You can show message using "displayMessage(String caption, String message)"
+     *
+     * @return String[2], the first string is caption, the second string is message.
+     * @see #displayMessage(String, String)
+     */
+    @SuppressWarnings("unused")
+    public String[] getMessage() {
+        return _getMessage();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to get results from the plugin
+     * You can add result using "addToResultQueue(String result)".
+     *
+     * @return result
+     * @see #addToResultQueue(String)
+     */
+    @SuppressWarnings("unused")
+    public String pollFromResultQueue() {
+        return _pollFromResultQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to check the API version.
+     *
+     * @return Api version
+     */
+    @SuppressWarnings("unused")
+    public int getApiVersion() {
+        return _getApiVersion();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to clear results to prepare for the next time.
+     *
+     * @see #addToResultQueue(String)
+     * @see #pollFromResultQueue()
+     */
+    @SuppressWarnings("unused")
+    public void clearResultQueue() {
+        _clearResultQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to poll the event that send from the plugin.
+     * The object array contains two parts.
+     * object[0] contains the fully-qualified name of class.
+     * object[1] contains the params that the event need to build an instance.
+     * To send an event to File-Engine
+     *
+     * @return Event
+     * @see #sendEventToFileEngine(String, Object...)
+     * @see #sendEventToFileEngine(Event)
+     */
+    @SuppressWarnings("unused")
+    public Object[] pollFromEventQueue() {
+        return _pollFromEventQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to replace the handler which the plugin is registered.
+     * The object array contains two parts.
+     * object[0] contains the fully-qualified name of class.
+     * object[1] contains a consumer to hande the event.
+     *
+     * @return Event handler
+     * @see #registerFileEngineEventHandler(String, BiConsumer)
+     */
+    @SuppressWarnings("unused")
+    public Object[] pollFromEventHandlerQueue() {
+        return _pollEventHandlerQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to restore the handler which the plugin is registered.
+     *
+     * @return Event class fully-qualified name
+     * @see #restoreFileEngineEventHandler(String)
+     */
+    @SuppressWarnings("unused")
+    public String restoreFileEngineEventHandler() {
+        return _pollFromRestoreQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used for File-Engine to add an event listener for this plugin.
+     * The object array contains two parts.
+     * object[0] contains the fully-qualified name of class.
+     * object[1] contains a consumer to execute when the event is finished.
+     *
+     * @return Event listener
+     */
+    @SuppressWarnings("unused")
+    public Object[] pollFromEventListenerQueue() {
+        return _pollFromEventListenerQueue();
+    }
+
+    /**
+     * Do Not Remove, this is used to remove a plugin registered event listener.
+     *
+     * @return Event class fully-qualified name
+     */
+    @SuppressWarnings("unused")
+    public String[] removeFileEngineEventListener() {
+        return _pollFromRemoveListenerQueue();
     }
 }
