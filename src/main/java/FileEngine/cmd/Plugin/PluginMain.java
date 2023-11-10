@@ -193,21 +193,18 @@ public class PluginMain extends Plugin {
                 throw new RuntimeException(e);
             }
         } else {
-            String[] strings = colon.split(result);
-            if (strings.length == 2) {
-                String command = strings[1];
-                if ("wt".equalsIgnoreCase(command.trim())) {
-                    command += " && exit";
-                }
-                String batFile = tmpDir + File.separator + "$$bat.bat";
-                generateBatFile(command, batFile);
-                String start = batFile.substring(0, 2);
-                String end = batFile.substring(2);
-                try {
-                    Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            String command = result.substring("运行命令:".length());
+            if ("wt".equalsIgnoreCase(command.trim())) {
+                command += " && exit";
+            }
+            String batFile = tmpDir + File.separator + "$$bat.bat";
+            generateBatFile(command, batFile);
+            String start = batFile.substring(0, 2);
+            String end = batFile.substring(2);
+            try {
+                Runtime.getRuntime().exec("cmd.exe /k start " + start + "\"" + end + "\"");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }

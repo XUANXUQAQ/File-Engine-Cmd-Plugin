@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class UpdateUtil {
-    private static final String CURRENT_VERSION = "1.9";
+    private static final String CURRENT_VERSION = "2.0";
     private static String updateURL;
     private static final ConcurrentLinkedQueue<String> downloadTasks = new ConcurrentLinkedQueue<>();
 
